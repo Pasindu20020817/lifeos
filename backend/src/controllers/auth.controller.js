@@ -1,8 +1,10 @@
 // Import Prisma client
 const prisma = require("../config/prisma");
-
 // Import bcrypt for password hashing
 const bcrypt = require("bcryptjs");
+// JWT package used to generate authentication tokens
+const jwt = require("jsonwebtoken");
+
 
 /**
  * Register a new user
@@ -68,7 +70,90 @@ const register = async (req, res) => {
   }
 };
 
+
+/**
+ * Login user
+ *
+ * Route:
+ * POST /api/auth/login
+ */
+const login = async (req, res) => {
+  try {
+    // Get email and password from request
+    const { email, password } = req.body;
+
+    // Check required fields
+    if (!email || !password) {
+      return res.status(400).json({
+        success: false,
+        message: "Email and password are required",
+      });
+    }
+
+    // Find user by email
+    const user = await prisma.user.findUnique({
+      where: {
+        email,
+      },
+    });
+
+    // User not found
+    if (!user) {
+      return res.status(401).json({
+        success: false,
+        message: "Invalid credentials",
+      });
+    }
+
+    // Compare password with hashed password
+    const isPasswordCorrect = await bcrypt.compare(
+      password,
+      user.password
+    );
+
+    if (!isPasswordCorrect) {
+      return res.status(401).json({
+        success: false,
+        message: "Invalid credentials",
+      });
+    }
+
+    // Generate JWT token
+    const token = jwt.sign(
+      {
+        userId: user.id,
+        email: user.email,
+      },
+      process.env.JWT_SECRET,
+      {
+        expiresIn: "7d",
+      }
+    );
+
+    // Return success response
+    return res.status(200).json({
+      success: true,
+      message: "Login successful",
+      token,
+      user: {
+        id: user.id,
+        name: user.name,
+        email: user.email,
+      },
+    });
+
+  } catch (error) {
+    console.error("Login Error:", error);
+
+    return res.status(500).json({
+      success: false,
+      message: "Internal Server Error",
+    });
+  }
+};
+
 // Export controller function
 module.exports = {
   register,
+  login,
 };
