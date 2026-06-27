@@ -152,8 +152,55 @@ const login = async (req, res) => {
   }
 };
 
+
+/**
+ * Get current logged-in user's profile
+ *
+ * Route:
+ * GET /api/auth/profile
+ */
+const getProfile = async (req, res) => {
+  try {
+    
+    // Find user from token data
+    const user = await prisma.user.findUnique({
+      where: {
+        id: req.user.userId,
+      },
+    });
+
+    // User not found
+    if (!user) {
+      return res.status(404).json({
+        success: false,
+        message: "User not found",
+      });
+    }
+
+    // Return profile
+    return res.status(200).json({
+      success: true,
+      user: {
+        id: user.Id,
+        name: user.name,
+        email: user.email,
+        createdAt: user.createdAt,
+      },
+    });
+
+  } catch (error) {
+    console.error("Profile error:", error);
+
+    return res.status(500).json({
+      success: false,
+      message: "Internal Server Error",
+    });
+  }
+};
+
 // Export controller function
 module.exports = {
   register,
   login,
+  getProfile,
 };
