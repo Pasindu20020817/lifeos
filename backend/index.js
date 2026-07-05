@@ -3,7 +3,8 @@ const cors = require("cors");
 
 //Import auth routes
 const authRoutes = require("./src/routes/auth.routes");
-
+// Import task routes
+const taskRoutes = require("./src/routes/task.routes");
 
 //////////////////////////////////////////////////////////////
 //temporerly for testing prisma connection
@@ -29,6 +30,8 @@ app.use(express.json());
 
 // All auth routes start with /api/auth
 app.use("/api/auth", authRoutes);
+// All task routes start with /api/tasks
+app.use("/api/tasks", taskRoutes);
 
 app.get("/", (req, res) => {
   res.send("LifeOS API is running 🚀");
