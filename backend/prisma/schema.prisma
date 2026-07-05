@@ -13,6 +13,27 @@ model User {
   email     String   @unique
   password  String
 
+  // One user can have many tasks
+  tasks Task[]
+
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+}
+
+model Task{
+  id          String @id @default(uuid())
+  title       String
+  descriptio  String?
+  status      String @default("PENDING")
+  priority    String @default("MEDIUM")
+  dueDate     DateTime?
+
+  createdAt   DateTime @default(now())
+  updatedAT   DateTime @updatedAt
+
+  // Foreign key
+  userId      String
+
+  // Relationship to user
+  user        User  @relation(fields: [userId], references: [id])
 }
