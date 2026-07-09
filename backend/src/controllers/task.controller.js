@@ -101,7 +101,51 @@ const getAllTasks = async (req, res) => {
     }
 };
 
+/**
+ * ==========================================
+ * Get Single Task
+ * Route:
+ * GET /api/tasks/:id
+ * ==========================================
+ */
+const getTaskById = async (req, res) => {
+    try {
+        
+        // Task ID from URL
+        const {id} = req.params;
+
+        const task = await prisma.task.findFirst({
+            where: {
+                id,
+                userId: req.user.userId,
+            },
+        });
+
+        // Task not found
+        if(!task) {
+            return res.status(404).json({
+                success: false,
+                message: "Task not found",
+            });
+        }
+
+        return res.status(200).json({
+            success: true,
+            task,
+        });
+
+    } catch (error) {
+        console.error("Get Task Error:", error);
+
+        return res.status(500).json({
+            success: false,
+            message: "Internal Server Error",
+        });
+    }
+};
+
 module.exports = {
     createTask,
     getAllTasks,
+    getTaskById,
 }
