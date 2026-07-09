@@ -60,6 +60,48 @@ const createTask = async (req, res) => {
     }
 };
 
+/**
+ * ==========================================
+ * Get All Tasks
+ * Route:
+ * GET /api/tasks
+ * ==========================================
+ */
+const getAllTasks = async (req, res) => {
+    try {
+      /**
+      * Find all tasks that belong
+      * to the logged-in user.
+      */  
+     const tasks = await prisma.task.findMany({
+        // only  this user's tasks
+        where: {
+            userId: req.user.userId,
+        },
+
+        // Newest tasks first
+        orderBy: {
+            createdAt: "desc",
+        }
+     });
+
+     return res.status(200).json({
+        success: true,
+        count: tasks.length,
+        tasks,
+     });
+
+    } catch (error) {
+        console.error("Get All Tasks Error:", error);
+
+        return res.status(500).json({
+            success: false,
+            message: "Internal Server Error",
+        });
+    }
+};
+
 module.exports = {
     createTask,
+    getAllTasks,
 }

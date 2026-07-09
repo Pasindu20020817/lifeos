@@ -7,13 +7,12 @@ const authenticate = require("../middleware/auth.middleware");
 
 
 // Import controller 
-const {createTask,} = require("../controllers/task.controller");
+const {createTask, getAllTasks} = require("../controllers/task.controller");
 
-/**
- * Create Task
- *
- * Protected Route
- */
+// Create a new task for authenticated user 
 router.post("/", authenticate, createTask);
+// Get all tasks for authenticated user
+router.get("/", authenticate, getAllTasks);
+
 
 module.exports = router;
