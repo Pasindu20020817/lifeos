@@ -7,7 +7,7 @@ const authenticate = require("../middleware/auth.middleware");
 
 
 // Import controller 
-const {createTask, getAllTasks, getTaskById, updateTask } = require("../controllers/task.controller");
+const {createTask, getAllTasks, getTaskById, updateTask, deleteTask } = require("../controllers/task.controller");
 
 // Create a new task for authenticated user 
 router.post("/", authenticate, createTask);
@@ -17,6 +17,8 @@ router.get("/", authenticate, getAllTasks);
 router.get("/:id", authenticate, getTaskById);
 // Update a task by ID for authenticated user
 router.put("/:id", authenticate, updateTask);
+// Delete a task by ID for authenticated user
+router.delete("/:id", authenticate, deleteTask);
 
 
 module.exports = router;

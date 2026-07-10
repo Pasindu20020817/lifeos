@@ -216,9 +216,65 @@ const updateTask = async (req, res) => {
     }
 }
 
+/**
+ * ==========================================
+ * Delete Task
+ * Route:
+ * DELETE /api/tasks/:id
+ * ==========================================
+ */
+const deleteTask = async (req, res) => {
+    try {
+
+        // Get task ID from URL
+        const {id} = req.params;
+
+        /**
+        * Check if task exists
+        * and belongs to logged-in user
+        */
+       const existingTask = await prisma.task.findFirst({
+        where: {
+            id,
+            userId: req.user.userId,
+        },
+       });
+
+       if(!existingTask) {
+        return res.status(404).json({
+            success: false,
+            message: "Task not found",
+        });
+       }
+
+       /**
+        * Delete task
+        */
+       await prisma.task.delete({
+        where: {
+            id,
+        },
+       });
+
+       return res.status(200).json({
+        success: true,
+        message: "Task deleted successfully",
+       });
+
+    } catch (error) {
+        console.error("Delete Task Error:", error);
+
+        return res.status(500).json({
+            success: false,
+            message: "Internal Server Error",
+        });
+    }
+};
+
 module.exports = {
     createTask,
     getAllTasks,
     getTaskById,
     updateTask,
+    deleteTask
 }
