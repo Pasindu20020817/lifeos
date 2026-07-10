@@ -144,8 +144,81 @@ const getTaskById = async (req, res) => {
     }
 };
 
+/**
+ * ==========================================
+ * Update Task
+ * Route:
+ * PUT /api/tasks/:id
+ * ==========================================
+ */
+const updateTask = async (req, res) => {
+    try {
+        
+        // Task ID from URL
+        const {id} = req.params;
+
+        // Data from request body
+        const {
+            title,
+            description,
+            status,
+            priority,
+            dueDate,
+        } = req.body;
+
+        /**
+         * First check whether task exists
+        * and belongs to the logged-in user
+        */
+       const existingTask = await prisma.task.findFirst({
+        where: {
+            id,
+            userId: req.user.userId,
+        },
+       });
+
+       if(!existingTask) {
+        return res.status(404).json({
+            success: false,
+            message: "Task not found",
+        });
+       }
+
+       /**
+        * Update task
+        */
+       const updatedTask = await prisma.task.update({
+        where: {
+            id,
+        },
+        data: {
+            title,
+            description,
+            status,
+            priority,
+            dueDate: dueDate ? new Date(dueDate) : null,
+        },
+       });
+
+       return res.status(200).json ({
+        success: true,
+        message: "Task updated successfully",
+        task: updatedTask,
+       });
+
+    } catch (error) {
+        console.error("Update Task Error:", error);
+
+        return res.status(500).json({
+            success: false,
+            message: "Internal Server Error",
+        });
+    }
+}
+
 module.exports = {
     createTask,
     getAllTasks,
     getTaskById,
+    updateTask,
 }
