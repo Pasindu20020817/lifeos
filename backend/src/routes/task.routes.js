@@ -9,8 +9,12 @@ const authenticate = require("../middleware/auth.middleware");
 // Import controller 
 const {createTask, getAllTasks, getTaskById, updateTask, deleteTask } = require("../controllers/task.controller");
 
+//Import validation middleware
+const validate = require("../middleware/validate.middleware");
+const {createTaskSchema, } = require("../validations/task.validation");
+
 // Create a new task for authenticated user 
-router.post("/", authenticate, createTask);
+router.post("/", authenticate, validate(createTaskSchema), createTask);
 // Get all tasks for authenticated user
 router.get("/", authenticate, getAllTasks);
 // Get a single task by ID for the authenticated user
