@@ -8,6 +8,11 @@ const taskRoutes = require("./src/routes/task.routes");
 //Import the error handler middleware
 const errorHandler = require("./src/middleware/error.middleware");
 
+//Import swagger documentation
+const swaggerUi = require("swagger-ui-express");
+//Import swagger specification
+const swaggerSpec = require("./src/docs/swagger");
+
 //////////////////////////////////////////////////////////////
 //temporerly for testing prisma connection
 const prisma = require("./src/config/prisma");
@@ -34,6 +39,8 @@ app.use(express.json());
 app.use("/api/auth", authRoutes);
 // All task routes start with /api/tasks
 app.use("/api/tasks", taskRoutes);
+// Swagger documentation route
+app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 
 app.get("/", (req, res) => {
   res.send("LifeOS API is running 🚀");
