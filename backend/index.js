@@ -5,6 +5,8 @@ const cors = require("cors");
 const authRoutes = require("./src/routes/auth.routes");
 // Import task routes
 const taskRoutes = require("./src/routes/task.routes");
+//Import the error handler middleware
+const errorHandler = require("./src/middleware/error.middleware");
 
 //////////////////////////////////////////////////////////////
 //temporerly for testing prisma connection
@@ -42,6 +44,11 @@ const PORT = 5000;
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
 });
+
+
+
+//Global error handler 
+app.use(errorHandler);
 
 
 
