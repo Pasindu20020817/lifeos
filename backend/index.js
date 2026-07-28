@@ -13,6 +13,9 @@ const swaggerUi = require("swagger-ui-express");
 //Import swagger specification
 const swaggerSpec = require("./src/docs/swagger");
 
+//Import note routes
+const noteRoutes = require("./src/routes/note.routes");
+
 //////////////////////////////////////////////////////////////
 //temporerly for testing prisma connection
 const prisma = require("./src/config/prisma");
@@ -39,6 +42,8 @@ app.use(express.json());
 app.use("/api/auth", authRoutes);
 // All task routes start with /api/tasks
 app.use("/api/tasks", taskRoutes);
+// All note routes start with /api/notes
+app.use("/api/notes", noteRoutes);
 // Swagger documentation route
 app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 
