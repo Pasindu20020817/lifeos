@@ -29,9 +29,13 @@ model User {
   // One user can have many tasks
   tasks Task[]
 
+  //One user can have many notes
+  notes Note[]
+
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }
+
 
 model Task{
   id           String @id @default(uuid())
@@ -49,4 +53,23 @@ model Task{
 
   // Relationship to user
   user         User  @relation(fields: [userId], references: [id])
+}
+
+
+model Note {
+  id        String   @id @default(uuid())
+
+  title     String
+
+  content   String
+
+  createdAt DateTime @default(now())
+
+  updatedAt DateTime @updatedAt
+
+  // Foreign Key
+  userId    String
+
+  // Relationship
+  user      User @relation(fields: [userId], references: [id])
 }
