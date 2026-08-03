@@ -28,6 +28,17 @@ const createTaskSchema = z.object({
     .string()
     .optional(),
 
+  /**
+ * Optional Goal ID
+ *
+ * Allows task to belong
+ * to a goal.
+ */
+  goalId: z
+    .string()
+    .uuid("Invalid Goal ID")
+    .optional(),
+
 });
 
 module.exports = {

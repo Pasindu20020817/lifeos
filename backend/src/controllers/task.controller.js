@@ -16,6 +16,7 @@ const createTask = async (req, res) => {
             description,
             priority,
             dueDate,
+            goalId,
         } =  req.body;
 
         // Validate required field
@@ -24,6 +25,23 @@ const createTask = async (req, res) => {
                 success: false,
                 message: "Title is required",
             });
+        }
+
+
+        if(goalId) {
+            const goal = await prisma.goal.findFirst({
+                where: {
+                    id: goalId,
+                    userId: req.user.userId,
+                },
+            });
+
+            if (!goal) {
+                return res.status(404).json({
+                    success: false,
+                    message: "Goal not found or does not belong to the user",
+                });
+            }
         }
 
         /**
@@ -39,6 +57,7 @@ const createTask = async (req, res) => {
             description,
             priority,
             dueDate: dueDate ? new Date(dueDate) : null,
+            goalId,
 
             // Owner of the task 
             userId: req.user.userId,
