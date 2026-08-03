@@ -9,10 +9,10 @@ const authenticate = require("../middleware/auth.middleware");
 const validate = require("../middleware/validate.middleware");
 
 // Goal validation schema
-const {createGoalSchema, updateGoalSchema} = require("../validations/goal.validation");
+const {createGoalSchema, updateGoalSchema, } = require("../validations/goal.validation");
 
 // Goal controller
-const {createGoal, getAllGoals, getGoalById, updateGoal,} = require("../controllers/goal.controller");
+const {createGoal, getAllGoals, getGoalById, updateGoal, deleteGoal, } = require("../controllers/goal.controller");
 
 // Create Goal
 router.post("/", authenticate, validate(createGoalSchema),createGoal);
@@ -22,5 +22,7 @@ router.get("/", authenticate, getAllGoals);
 router.get("/:id", authenticate, getGoalById);
 //Update Goal by ID
 router.put("/:id", authenticate, validate(updateGoalSchema), updateGoal);
+//Delete Goal by ID
+router.delete("/:id", authenticate, deleteGoal);
 
 module.exports = router;

@@ -192,9 +192,62 @@ const updateGoal = async (req, res) => {
     }
 }
 
+/**
+ * Delete Goal
+ *
+ * Deletes a goal owned by
+ * the authenticated user.
+ */
+const deleteGoal = async (req, res) => {
+    try {
+
+        //Goal ID from URL
+        const { id} = req.params;
+         
+        /**
+        * Check if goal exists
+        * and belongs to user
+        */
+        const goal = await prisma.goal.findFirst({
+            where: {
+                id,
+                userId: req.user.userId,
+            },
+        });
+
+        if (!goal) {
+            return res.status(404).json({
+                success: false,
+                message: "Goal not found",
+            });
+        }
+
+        // Delete goal
+        await prisma.goal.delete({
+            where: {
+                id,
+            },
+        });
+
+        return res.status(200).json({
+            success: true,
+            message: "Goal deleted successfully",
+        });
+
+    } catch (error) {
+        console.error("Delete Goal Error:", error);
+
+        return res.status(500).json({
+            success: false,
+            message: "Internal Server Error",
+        });
+    }
+};
+
 module.exports = {
     createGoal,
     getAllGoals,
     getGoalById,
     updateGoal,
+    deleteGoal,
 };
