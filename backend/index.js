@@ -15,6 +15,8 @@ const swaggerSpec = require("./src/docs/swagger");
 
 //Import note routes
 const noteRoutes = require("./src/routes/note.routes");
+//Import goal routes
+const goalRoutes = require("./src/routes/goal.routes");
 
 //////////////////////////////////////////////////////////////
 //temporerly for testing prisma connection
@@ -44,6 +46,8 @@ app.use("/api/auth", authRoutes);
 app.use("/api/tasks", taskRoutes);
 // All note routes start with /api/notes
 app.use("/api/notes", noteRoutes);
+// All goal routes start with /api/goals
+app.use("/api/goals", goalRoutes);
 // Swagger documentation route
 app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 
