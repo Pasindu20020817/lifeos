@@ -122,8 +122,79 @@ const getGoalById = async (req, res) => {
     }
 };
 
+
+/**
+ * Update Goal
+ *
+ * Updates a goal owned
+ * by the authenticated user.
+ */
+const updateGoal = async (req, res) => {
+
+    try  {
+        
+        // Get Goal ID from URL
+        const { id } = req.params;
+
+        // Get data from request body
+        const {
+            title,
+            description,
+            status,
+            targetDate,
+        } = req.body;
+
+        /**
+        * Check ownership
+        */
+        const existingGoal = await prisma.goal.findFirst({
+            where: {
+                id,
+                userId: req.user.userId,
+            },
+        });
+
+        if (!existingGoal) {
+            return res.status(404).json({
+                success: false,
+                message: "Goal not found",
+            });
+        }
+
+        // Update goal
+        const updatedGoal = await prisma.goal.update({
+            where: {
+                id,
+            },
+
+            data: {
+                title,
+                description,
+                status,
+                targetDate:
+                   targetDate ? new Date(targetDate): undefined,
+            },
+        });
+
+        return res.status(200).json ({
+            success: true,
+            message: "Goal updated successfully",
+            goal: updatedGoal,
+        });
+
+    } catch (error) {
+        console.error("Update Goal Error: ", error);
+        
+        return res.status(500).json({
+            success: false,
+            message: "Internal Server Error",
+        });
+    }
+}
+
 module.exports = {
     createGoal,
     getAllGoals,
     getGoalById,
+    updateGoal,
 };
