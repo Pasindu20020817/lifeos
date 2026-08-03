@@ -20,6 +20,17 @@ enum TaskPriority {
   HIGH
 }
 
+//Goal Status Enum
+enum GoalStatus {
+
+  NOT_STARTED
+
+  IN_PROGRESS
+
+  COMPLETED
+
+}
+
 model User {
   id        String   @id @default(uuid())
   name      String
@@ -31,6 +42,8 @@ model User {
 
   //One user can have many notes
   notes Note[]
+
+  goals Goal[]
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -48,11 +61,17 @@ model Task{
   createdAt    DateTime @default(now())
   updatedAt    DateTime @updatedAt
 
-  // Foreign key
+  // User Foreign key
   userId       String
+
+  //Goal Foreign key
+  goalId       String?
 
   // Relationship to user
   user         User  @relation(fields: [userId], references: [id])
+
+  // Relationship to Goal
+   goal         Goal? @relation(fields: [goalId], references: [id])
 }
 
 
@@ -72,4 +91,46 @@ model Note {
 
   // Relationship
   user      User @relation(fields: [userId], references: [id])
+}
+
+
+model Goal {
+
+  // Primary Key
+  id          String   @id @default(uuid())
+
+  // Goal title
+  title       String
+
+  // Goal description
+  description String?
+
+  /**
+   * Goal status
+   *
+   * NOT_STARTED
+   * IN_PROGRESS
+   * COMPLETED
+   */
+  status      GoalStatus @default(NOT_STARTED)
+
+  // Target completion date
+  targetDate  DateTime?
+
+  // Timestamps
+  createdAt   DateTime @default(now())
+
+  updatedAt   DateTime @updatedAt
+
+  //Foreign Key
+  userId      String
+
+  //Relationship to User
+  user      User @relation(fields: [userId], references: [id])
+  /**
+   * Relationship to Tasks
+   *
+   * One Goal -> Many Tasks
+   */
+  tasks       Task[]
 }
