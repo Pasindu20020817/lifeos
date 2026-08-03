@@ -12,13 +12,13 @@ const validate = require("../middleware/validate.middleware");
 const {createGoalSchema,} = require("../validations/goal.validation");
 
 // Goal controller
-const {createGoal,} = require("../controllers/goal.controller");
+const {createGoal, getAllGoals, getGoalById,} = require("../controllers/goal.controller");
 
-/**
- * POST /api/goals
- *
- * Create Goal
- */
+// Create Goal
 router.post("/", authenticate, validate(createGoalSchema),createGoal);
+//Get All Goals
+router.get("/", authenticate, getAllGoals);
+//Get Goal by ID
+router.get("/:id", authenticate, getGoalById);
 
 module.exports = router;
