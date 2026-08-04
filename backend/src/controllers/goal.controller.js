@@ -97,6 +97,19 @@ const getGoalById = async (req, res) => {
                 id,
                 userId: req.user.userId,
             },
+
+            //include related tasks
+            include: {
+                tasks: {
+                    select: {
+                        id: true,
+                        title: true,
+                        status: true,
+                        priority: true,
+                        dueDate: true,
+                    },
+                },
+            },
         });
 
         //Goal not found
