@@ -32,6 +32,10 @@ const getDashboard = async (req, res) => {
         },
       });
 
+    // Goall completion percentage
+    const  goalCompletionRate = totalGoals === 0 ? 0 : Math.round(
+        (completedGoals / totalGoals) * 100
+    );
 
     /**
      * Total Tasks
@@ -53,6 +57,11 @@ const getDashboard = async (req, res) => {
         },
       });
 
+    // Task completion percentage
+    const taskCompletionRate = totalTasks === 0 ? 0 : Math.round(
+        (completedTasks / totalTasks) * 100
+    );
+
 
     /**
      * Total Notes
@@ -62,6 +71,51 @@ const getDashboard = async (req, res) => {
           userId,
         },
       });
+
+    /**
+    * Latest 5 tasks
+    */
+    const recentTasks = await prisma.task.findMany({
+        where: {
+            userId,
+        },
+
+        orderBy: {
+            createdAt: "desc",
+        },
+
+        take: 5,
+
+        select: {
+            id: true,
+            title: true,
+            status: true,
+            priority: true,
+            createdAt: true,
+        },
+    });
+
+
+    /**
+    * Latest 5 notes
+    */
+    const recentNotes = await prisma.note.findMany({
+        where: {
+            userId,
+        },
+
+        orderBy: {
+            createdAt: "desc",
+        },
+
+        take: 5,
+
+        select: {
+            id: true,
+            title: true,
+            createdAt: true,
+        },
+    });
 
     return res.status(200).json({
       success: true,
@@ -76,7 +130,13 @@ const getDashboard = async (req, res) => {
 
         totalNotes,
 
+        taskCompletionRate,
+        goalCompletionRate,
+
       },
+
+      recentTasks,
+      recentNotes,
 
     });
 
