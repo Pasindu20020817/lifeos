@@ -120,9 +120,29 @@ const getGoalById = async (req, res) => {
             });
         }
 
+        //Total tasks in goal
+        const totalTasks = goal.tasks.length;
+
+        // Completed tasks
+        const completedTasks = goal.tasks.filter(task => task.status === "COMPLETED").length;
+
+        /* Progress percentage
+           Example:
+           2 completed / 4 total = 50%
+        */
+        const progress = totalTasks === 0 ? 0 : Math.round(
+            (completedTasks / totalTasks) * 100
+        );
+
         return res.status(200).json({
             success: true,
             goal,
+
+            status: {
+                totalTasks,
+                completedTasks,
+                progress,
+            },
         });
 
     } catch (error) {
