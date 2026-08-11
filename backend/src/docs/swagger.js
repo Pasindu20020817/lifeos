@@ -17,7 +17,15 @@ const options = {
 
     servers: [
       {
+        //Production backend deployed on Render
+        url: "https://lifeos-api-m1k2.onrender.com",
+        description: "Production server",
+      },
+
+      {
+        //Local backend used during  development
         url: "http://localhost:5000",
+        description: "Local development server",
       },
     ],
 
