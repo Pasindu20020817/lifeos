@@ -1,77 +1,159 @@
+// Load variables from the local .env file.
+// On Render, environment variables come from the Render dashboard.
+require("dotenv").config();
+
+// Import Express framework
 const express = require("express");
+
+// Import CORS middleware
 const cors = require("cors");
 
-//Import auth routes
+// Import authentication routes
 const authRoutes = require("./src/routes/auth.routes");
+
 // Import task routes
 const taskRoutes = require("./src/routes/task.routes");
-//Import the error handler middleware
-const errorHandler = require("./src/middleware/error.middleware");
 
-//Import swagger documentation
-const swaggerUi = require("swagger-ui-express");
-//Import swagger specification
-const swaggerSpec = require("./src/docs/swagger");
-
-//Import note routes
+// Import note routes
 const noteRoutes = require("./src/routes/note.routes");
-//Import goal routes
+
+// Import goal routes
 const goalRoutes = require("./src/routes/goal.routes");
-//Import dashboard routes
+
+// Import dashboard routes
 const dashboardRoutes = require("./src/routes/dashboard.routes");
 
-//////////////////////////////////////////////////////////////
-//temporerly for testing prisma connection
+// Import global error handler middleware
+const errorHandler = require("./src/middleware/error.middleware");
+
+// Import Swagger UI
+const swaggerUi = require("swagger-ui-express");
+
+// Import Swagger specification
+const swaggerSpec = require("./src/docs/swagger");
+
+// Import Prisma client
 const prisma = require("./src/config/prisma");
 
-// Test database connection
-async function testDB() {
-  try {
-    await prisma.$connect();
-    console.log("✅ Database connected successfully");
-  } catch (error) {
-    console.error("❌ Database connection failed");
-    console.error(error);
-  }
-}
-testDB();
-///////////////////////////////////////////////////////////////
-
+// Create Express application
 const app = express();
 
+/**
+ * ==============================
+ * Global Middleware
+ * ==============================
+ */
+
+// Allow requests from other origins.
+// Later, when the React frontend is deployed,
+// we can restrict this to only the frontend URL.
 app.use(cors());
+
+// Allow Express to read JSON request bodies.
 app.use(express.json());
 
-// All auth routes start with /api/auth
+/**
+ * ==============================
+ * API Routes
+ * ==============================
+ */
+
+// Authentication routes
+// Example: /api/auth/login
 app.use("/api/auth", authRoutes);
-// All task routes start with /api/tasks
+
+// Task routes
+// Example: /api/tasks
 app.use("/api/tasks", taskRoutes);
-// All note routes start with /api/notes
+
+// Note routes
+// Example: /api/notes
 app.use("/api/notes", noteRoutes);
-// All goal routes start with /api/goals
+
+// Goal routes
+// Example: /api/goals
 app.use("/api/goals", goalRoutes);
-// Dashboard route
+
+// Dashboard routes
+// Example: /api/dashboard
 app.use("/api/dashboard", dashboardRoutes);
 
-// Swagger documentation route
-app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerSpec));
+/**
+ * ==============================
+ * Swagger Documentation
+ * ==============================
+ */
 
+// Swagger documentation will be available at:
+// /api-docs
+app.use(
+  "/api-docs",
+  swaggerUi.serve,
+  swaggerUi.setup(swaggerSpec)
+);
+
+/**
+ * ==============================
+ * Health / Root Route
+ * ==============================
+ */
+
+// Simple route to check whether the API is running.
 app.get("/", (req, res) => {
   res.send("LifeOS API is running 🚀");
 });
 
-const PORT = 5000;
-
-app.listen(PORT, () => {
-  console.log(`Server running on port ${PORT}`);
-});
-
-
-
-//Global error handler 
+/**
+ * ==============================
+ * Global Error Handler
+ * ==============================
+ *
+ * Important:
+ * This should come AFTER all normal routes.
+ *
+ * If an error is passed using next(error),
+ * Express sends it here.
+ */
 app.use(errorHandler);
 
+/**
+ * ==============================
+ * Server Startup
+ * ==============================
+ */
 
+// Render automatically provides process.env.PORT.
+//
+// When running locally, PORT will fall back to 5000.
+const PORT = process.env.PORT || 5000;
 
+/**
+ * Start the application only after
+ * successfully connecting to PostgreSQL.
+ */
+async function startServer() {
+  try {
+    // Connect Prisma to PostgreSQL.
+    await prisma.$connect();
 
+    console.log("✅ Database connected successfully");
 
+    /**
+     * Render requires the web service
+     * to listen on host 0.0.0.0.
+     */
+    app.listen(PORT, "0.0.0.0", () => {
+      console.log(`🚀 Server running on port ${PORT}`);
+    });
+  } catch (error) {
+    // If the database connection fails,
+    // show the error and stop the application.
+    console.error("❌ Database connection failed:");
+    console.error(error);
+
+    process.exit(1);
+  }
+}
+
+// Start LifeOS backend.
+startServer();
